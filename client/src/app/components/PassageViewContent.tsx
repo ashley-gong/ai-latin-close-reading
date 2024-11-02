@@ -2,85 +2,109 @@
 
 import { useState, useEffect } from "react";
 import PassageView from "./PassageView";
+import PassageSidebar from "./PassageSidebar";
 
-export default function EditablePassageContainer() {
-  const [title, setTitle] = useState("");
-  const [sections, setSections] = useState<string[]>([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+interface Section {
+  title: string;
+  indexLabel: string;
+  content: string;
+}
+
+export default function PassageViewContent() {
+  const [isDualView, setIsDualView] = useState(false);
+  const [leftText, setLeftText] = useState({ value: "caesar_gall1.txt", label: "Caesar Gallic Wars Book 1" });
+  const [rightText, setRightText] = useState({ value: "catullus.txt", label: "Catullus" });
+  const [leftSections, setLeftSections] = useState<Section[]>([]);
+  const [rightSections, setRightSections] = useState<Section[]>([]);
+  const [leftIndex, setLeftIndex] = useState(0);
+  const [rightIndex, setRightIndex] = useState(0);
+  const [isLeftSidebarVisible, setIsLeftSidebarVisible] = useState(true);
+
+  const textFiles = [
+    { label: "Caesar Gallic Wars Book 1", value: "caesar_gall1.txt" },
+    { label: "Caesar Gallic Wars Book 2", value: "caesar_gall2.txt" },
+    { label: "Catullus", value: "catullus.txt" }
+  ];
+
+  const loadSections = async (textFile: string, textTitle: string): Promise<Section[]> => {
+    const response = await fetch(`/${textFile}`);
+    if (!response.ok) throw new Error("Failed to load file");
+    
+    const text = await response.text();
+    const numberedSections = text.match(/\[\s*\d+\s*\][\s\S]*?(?=\[\s*\d+\s*\]|$)/g) || [];
+    return numberedSections.map((section, i) => {
+      const indexLabelMatch = section.match(/\[\s*(\d+)\s*\]/);
+      const title = textTitle;
+      const indexLabel = indexLabelMatch ? `${indexLabelMatch[1]}` : `${i + 1}`;
+      const content = section; //.replace(/\[\s*\d+\s*\]/, "").trim();
+      return { title, indexLabel, content };
+    });
+  };
 
   useEffect(() => {
-    // Fetch the text file directly from the public directory
-    fetch("/caesar_gall1.txt")
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Failed to load file");
-        }
-        return response.text();
-      })
-      .then((text) => {
-        const lines = text.split("\n");
-        console.log(lines[0])
-        setTitle(lines[0].toUpperCase()); // Use the first line as the title in all caps
+    loadSections(leftText.value, leftText.label)
+      .then(setLeftSections)
+      .catch(console.error);
+  }, [leftText]);
 
-        // Extract numbered sections
-        const numberedSections = text.match(/\[\s*\d+\s*\][^\[]+/g) || [];
-        setSections(numberedSections);
-      })
-      .catch((error) => console.error("Error loading file:", error));
-  }, []);
+  useEffect(() => {
+    loadSections(rightText.value, rightText.label)
+      .then(setRightSections)
+      .catch(console.error);
+  }, [rightText]);
 
-  const handleNext = () => {
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % sections.length);
+
+  const toggleSidebar = () => {
+    setIsLeftSidebarVisible(!isLeftSidebarVisible);
   };
 
-  const handlePrevious = () => {
-    setCurrentIndex((prevIndex) => (prevIndex - 1 + sections.length) % sections.length);
-  };
-
-  const toggleDropdown = () => {
-    setIsDropdownOpen((prev) => !prev);
+  const toggleDualView = () => {
+    setIsDualView(!isDualView);
   };
 
   return (
-    <div className="flex min-h-screen">
-      <aside className="w-1/4 mr-8 p-4">
-        <p className="font-bold mb-4">{title}</p>
-        
-        {/* Toggle Button for Dropdown */}
-        <button
-          onClick={toggleDropdown}
-          className="w-full p-2 bg-gray-500 text-white rounded mb-2"
-        >
-          {isDropdownOpen ? "Hide Sections" : "Show Sections"}
+    <div className="flex min-h-screen gap-4">
+
+      {!isLeftSidebarVisible && isDualView? (
+        <PassageSidebar
+          isDualView={isDualView}
+          textFiles={textFiles}
+          selectedText={rightText.value}
+          onTextChange={(value: string, label: string) => setRightText({ value, label })}
+          sections={rightSections}
+          selectedIndex={rightIndex}
+          onSelectIndex={setRightIndex}
+          title="Right"
+          onToggleSidebar={toggleSidebar}
+        />
+      ) : (
+        <PassageSidebar
+          isDualView={isDualView}
+          textFiles={textFiles}
+          selectedText={leftText.value}
+          onTextChange={(value: string, label: string) => setLeftText({ value, label })}
+          sections={leftSections}
+          selectedIndex={leftIndex}
+          onSelectIndex={setLeftIndex}
+          title="Left"
+          onToggleSidebar={toggleSidebar}
+        />
+      )}
+
+      <main className="flex flex-col items-center space-y-4 w-2/3">
+        <button onClick={toggleDualView} className="p-2 bg-gray-500 text-white rounded">
+          {isDualView ? "Switch to Single View" : "Switch to Dual View"}
         </button>
+        <div className="flex w-full gap-8">
+          <div className={isDualView ? 'flex-1' : 'w-full'}>
+            <PassageView title={`${leftSections[leftIndex]?.title}: ${leftSections[leftIndex]?.indexLabel}`} content={leftSections[leftIndex]?.content || ""} />
+          </div>
 
-        {/* Dropdown List */}
-        {isDropdownOpen && (
-          <ul className="space-y-2 bg-white p-4 rounded shadow-md h-64 overflow-y-auto">
-            {sections.map((_, index) => (
-              <li
-                key={index}
-                className={`cursor-pointer p-2 rounded ${
-                  currentIndex === index ? "bg-blue-500 text-white" : "bg-gray-100"
-                }`}
-                onClick={() => {
-                  setCurrentIndex(index);
-                }}
-              >
-                {index + 1}
-              </li>
-            ))}
-          </ul>
-        )}
-      </aside>
-
-      <main className="flex flex-col items-center space-y-4">
-        <PassageView title={title} content={sections[currentIndex] || ""} />
-
-        <div className="flex space-x-4 mt-4">
-          <button onClick={handlePrevious} className="p-2 bg-gray-300 rounded">Previous</button>
-          <button onClick={handleNext} className="p-2 bg-gray-300 rounded">Next</button>
+          {isDualView && 
+            <div className="flex-1">
+              <PassageView title={`${rightSections[rightIndex]?.title}: ${rightSections[rightIndex]?.indexLabel}`} content={rightSections[rightIndex]?.content || ""} />
+            </div>
+          }
         </div>
       </main>
     </div>

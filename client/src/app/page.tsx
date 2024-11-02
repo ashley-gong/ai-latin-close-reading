@@ -11,11 +11,11 @@ export default function Home() {
           <h1 className="font-bold text-2xl text-inherit">AI Intertextuality Search</h1>
         </NavbarBrand>
       </Navbar>
-      <main className="flex flex-row row-start-2 items-start sm:items-start gap-4">
-        <div className="w-full md:w-2/3">
+      <main className="flex flex-row row-start-2 items-start sm:items-start gap-4 w-full">
+        <div className="w-2/3">
           <PassageViewContent />
         </div>
-        <div className="w-full md:w-1/3">
+        <div className="w-1/3">
           <NearestNeighborQuery />
         </div>
       </main>
