@@ -4,7 +4,7 @@ import { Textarea, Input } from "@nextui-org/react";
 
 export default function NearestNeighborQuery() {
   return (
-    <div className="flex w-[40vh] flex-col md:flex-nowrap gap-4">
+    <div className="flex w-full flex-col md:flex-nowrap gap-4">
       <Textarea 
         isMultiline
         size="lg"
@@ -24,6 +24,9 @@ export default function NearestNeighborQuery() {
         onClear={() => console.log("cleared")}
         className="max-w-lg"
       />
+      <button className="p-2 bg-gray-500 hover:bg-gray-400 text-white rounded">
+        Submit
+      </button>
     </div>
   )
 }

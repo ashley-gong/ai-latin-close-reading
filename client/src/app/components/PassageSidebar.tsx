@@ -30,10 +30,10 @@ export default function PassageSidebar(
     onToggleSidebar
   }: SidebarProps) {
   return (
-    <aside className="flex flex-col w-1/4 mr-8 p-4">
+    <aside className="flex flex-col w-1/5 mr-8 p-4">
       <h1 className="font-semibold text-xl mb-2">Select Text ({title})</h1>
       {isDualView && 
-        <button onClick={onToggleSidebar} className="items-start mb-4 p-2 text-xs text-blue-700">
+        <button onClick={onToggleSidebar} className="items-start mb-4 p-2 text-xs hover:text-blue-500">
           Switch to {title === "Left" ? "Right" : "Left"} Sidebar
         </button>
       }

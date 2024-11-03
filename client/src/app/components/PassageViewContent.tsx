@@ -62,6 +62,7 @@ export default function PassageViewContent() {
     setIsDualView(!isDualView);
   };
 
+  // TODO eventually have the main view be a tab selector, want cluster graphs too
   return (
     <div className="flex min-h-screen gap-4">
 
@@ -92,7 +93,7 @@ export default function PassageViewContent() {
       )}
 
       <main className="flex flex-col items-center space-y-4 w-2/3">
-        <button onClick={toggleDualView} className="p-2 bg-gray-500 text-white rounded">
+        <button onClick={toggleDualView} className="p-2 bg-gray-500 hover:bg-gray-400 text-white rounded">
           {isDualView ? "Switch to Single View" : "Switch to Dual View"}
         </button>
         <div className="flex w-full gap-8">

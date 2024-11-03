@@ -9,12 +9,12 @@ interface PassageViewProps {
 export default function PassageView({title, content}: PassageViewProps) {
   return (
     <div>
-      <Card className="bg-slate-100 p-8 w-[50vh] mr-4 flex flex-col" shadow="none" radius="none">
+      <Card className="bg-slate-100 px-1 py-4 max-w-[50vh] flex flex-col" shadow="none" radius="none">
         <CardHeader>
           <h4 className="font-bold text-large">{title}</h4>
         </CardHeader>
-        <CardBody className="overflow-y-auto flex-grow whitespace-pre-wrap">
-          <p>{content}</p>
+        <CardBody className="overflow-y-auto whitespace-pre-wrap">
+          <p className="text-m">{content}</p>
         </CardBody>
       </Card>
     </div>

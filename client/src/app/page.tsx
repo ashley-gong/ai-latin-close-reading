@@ -12,10 +12,10 @@ export default function Home() {
         </NavbarBrand>
       </Navbar>
       <main className="flex flex-row row-start-2 items-start sm:items-start gap-4 w-full">
-        <div className="w-2/3">
+        <div className="w-4/5">
           <PassageViewContent />
         </div>
-        <div className="w-1/3">
+        <div className="w-1/5">
           <NearestNeighborQuery />
         </div>
       </main>
