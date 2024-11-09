@@ -85,13 +85,13 @@ def get_window_no_color(pos, sentence, window):
 def compare(berts, target_bert):
 
 	vals=[]
-	# matrix_all, sents_all, sent_ids_all, toks_all, position_in_sent_all, doc_ids=berts
-	matrix_all = berts["matrix_all"]
-	sents_all = berts["sents_all"]
-	sent_ids_all = berts["sent_ids_all"]
-	toks_all = berts["toks_all"]
-	position_in_sent_all = berts["position_in_sent_all"]
-	doc_ids = berts["doc_ids"]
+	matrix_all, sents_all, sent_ids_all, toks_all, position_in_sent_all, doc_ids=berts
+	# matrix_all = berts["matrix_all"]
+	# sents_all = berts["sents_all"]
+	# sent_ids_all = berts["sent_ids_all"]
+	# toks_all = berts["toks_all"]
+	# position_in_sent_all = berts["position_in_sent_all"]
+	# doc_ids = berts["doc_ids"]
 
 	for idx in range(len(doc_ids)):
 		c_matrix=matrix_all[idx]

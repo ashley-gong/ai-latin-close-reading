@@ -1,5 +1,4 @@
 import {Navbar, NavbarBrand} from "@nextui-org/react";
-import PassageViewContent from "./components/PassageViewContent";
 import NearestNeighborQuery from "./components/NearestNeighborQuery";
 
 export default function Home() {
@@ -12,12 +11,13 @@ export default function Home() {
         </NavbarBrand>
       </Navbar>
       <main className="flex flex-row row-start-2 items-start sm:items-start gap-4 w-full">
-        <div className="w-4/5">
+        {/* <div className="w-4/5">
           <PassageViewContent />
         </div>
         <div className="w-1/5">
           <NearestNeighborQuery />
-        </div>
+        </div> */}
+        <NearestNeighborQuery />
       </main>
       <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
         <p>Last updated 2024 by Ashley Gong.</p>

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import PassageView from "./PassageView";
 import PassageSidebar from "./PassageSidebar";
+import { textFiles } from '../../../utils/constants';
 
 interface Section {
   title: string;
@@ -10,7 +11,16 @@ interface Section {
   content: string;
 }
 
-export default function PassageViewContent() {
+interface Props {
+  querySent: boolean;
+  sectionIndex: number;
+  document: {
+    value: string;
+    label: string;
+  };
+}
+
+export default function PassageViewContent({ querySent, sectionIndex, document } : Props) {
   const [isDualView, setIsDualView] = useState(false);
   const [leftText, setLeftText] = useState({ value: "caesar_gall1.txt", label: "Caesar Gallic Wars Book 1" });
   const [rightText, setRightText] = useState({ value: "catullus.txt", label: "Catullus" });
@@ -19,17 +29,11 @@ export default function PassageViewContent() {
   const [leftIndex, setLeftIndex] = useState(0);
   const [rightIndex, setRightIndex] = useState(0);
   const [isLeftSidebarVisible, setIsLeftSidebarVisible] = useState(true);
-
-  const textFiles = [
-    { label: "Caesar Gallic Wars Book 1", value: "caesar_gall1.txt" },
-    { label: "Caesar Gallic Wars Book 2", value: "caesar_gall2.txt" },
-    { label: "Catullus", value: "catullus.txt" }
-  ];
+  const [querySections, setQuerySections] = useState<Section[]>([]);
 
   const loadSections = async (textFile: string, textTitle: string): Promise<Section[]> => {
     const response = await fetch(`/${textFile}`);
     if (!response.ok) throw new Error("Failed to load file");
-    
     const text = await response.text();
     const numberedSections = text.match(/\[\s*\d+\s*\][\s\S]*?(?=\[\s*\d+\s*\]|$)/g) || [];
     return numberedSections.map((section, i) => {
@@ -53,6 +57,11 @@ export default function PassageViewContent() {
       .catch(console.error);
   }, [rightText]);
 
+  useEffect(() => {
+    loadSections(document.value, document.label)
+    .then(setQuerySections)
+    .catch(console.error);
+  }, [querySent]);
 
   const toggleSidebar = () => {
     setIsLeftSidebarVisible(!isLeftSidebarVisible);
@@ -66,7 +75,7 @@ export default function PassageViewContent() {
   return (
     <div className="flex min-h-screen gap-4">
 
-      {!isLeftSidebarVisible && isDualView? (
+      {!isLeftSidebarVisible && isDualView && !querySent ? (
         <PassageSidebar
           isDualView={isDualView}
           textFiles={textFiles}
@@ -80,7 +89,7 @@ export default function PassageViewContent() {
         />
       ) : (
         <PassageSidebar
-          isDualView={isDualView}
+          isDualView={isDualView && !querySent}
           textFiles={textFiles}
           selectedText={leftText.value}
           onTextChange={(value: string, label: string) => setLeftText({ value, label })}
@@ -93,15 +102,26 @@ export default function PassageViewContent() {
       )}
 
       <main className="flex flex-col items-center space-y-4 w-2/3">
-        <button onClick={toggleDualView} className="p-2 bg-gray-500 hover:bg-gray-400 text-white rounded">
-          {isDualView ? "Switch to Single View" : "Switch to Dual View"}
-        </button>
+        {querySent ? 
+          <button onClick={() => console.log(querySections)} className="text-md font-bold">
+            Nearest Neighbor Query Context
+          </button> : 
+          <button onClick={toggleDualView} className="p-2 bg-gray-500 hover:bg-gray-400 text-white rounded">
+            {isDualView ? "Switch to Single View" : "Switch to Dual View"}
+          </button>
+        }
         <div className="flex w-full gap-8">
-          <div className={isDualView ? 'flex-1' : 'w-full'}>
+          <div className="flex-1">
             <PassageView title={`${leftSections[leftIndex]?.title}: ${leftSections[leftIndex]?.indexLabel}`} content={leftSections[leftIndex]?.content || ""} />
           </div>
 
-          {isDualView && 
+          {querySent &&
+            <div className="flex-1">
+              <PassageView title={`${querySections[sectionIndex - 1]?.title}: ${querySections[sectionIndex - 1]?.indexLabel}`} content={querySections[sectionIndex - 1]?.content || ""} />
+            </div>
+          }
+
+          {!querySent && isDualView && 
             <div className="flex-1">
               <PassageView title={`${rightSections[rightIndex]?.title}: ${rightSections[rightIndex]?.indexLabel}`} content={rightSections[rightIndex]?.content || ""} />
             </div>

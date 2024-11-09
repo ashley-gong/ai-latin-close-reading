@@ -166,10 +166,8 @@ class LatinBERT():
 
 		preds_in_order = [None for i in range(len(sents))]
 
-
 		for i, ind in enumerate(ordering):
 			preds_in_order[ind] = ordered_preds[i]
-
 
 		bert_sents=[]
 
