@@ -1,3 +1,7 @@
 client/node_modules
 
 server/venv
+server/__pycache__
+server/models/latin_bert
+server/models/.DS_Store
+server/scripts/__pycache__
