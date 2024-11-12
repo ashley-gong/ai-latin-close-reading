@@ -50,7 +50,7 @@ def query_similarity():
         
     results = index.query(vector=target_embedding, top_k=5, include_metadata=True)
     output = []
-    for match in results['matches']:
+    for match in results['matches']:      
       output.append({
             "score": match['score'], 
             "token": match['metadata']['token'], 

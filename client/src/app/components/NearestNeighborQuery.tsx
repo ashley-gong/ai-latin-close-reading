@@ -16,12 +16,12 @@ export default function NearestNeighborQuery() {
   const [sectionIndex, setSectionIndex] = useState(-1);
   const [querySent, setQuerySent] = useState(false);
   const [document, setDocument] = useState({ value: "", label: "" });
+  const [sentence, setSentence] = useState('');
 
-  // Handle the submit button click
   const handleSubmit = async () => {
     setSubmittedText({ queryText, targetWord });
     setLoading(true);
-    const dataToSend = { targetWord: targetWord, queryText: queryText }; // Replace with the actual data you want to send
+    const dataToSend = { targetWord: targetWord, queryText: queryText };
     try {
       setLoading(true);
       const responseData = await query(dataToSend);
@@ -33,24 +33,54 @@ export default function NearestNeighborQuery() {
     }
   };
 
-  const handleSectionSelect = (currSection: string, currDocument: string) => {
-    console.log(currDocument);
+  const handleSectionSelect = (currSection: string, currDocument: string, currSentence: string) => {
     setSectionIndex(Number(currSection));
+    setSentence(currSentence);
     const currText = textFiles.find(text => text.value === currDocument);
-    console.log(currText);
     if (currText) {
       setDocument(currText);
     }
     setQuerySent(true);
   }
 
+  const highlightTokenInSentence = (sentence: string, token: string) => {
+    const escapedToken = token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`(\\b${escapedToken}\\b)`, 'gi');
+    const parts = sentence.split(regex);   
+    return parts.map((part, index) =>
+      part.toLowerCase() === token.toLowerCase() ? (
+        <span key={index} className="bg-blue-300">{part}</span>
+      ) : (
+        part
+      )
+    );
+  };
+
+  const roundScore = (score: number) => {
+    return score.toFixed(3);
+  }
+
   return (
     <div className="flex flex-row row-start-2 items-start sm:items-start gap-4 w-full">
       <div className="w-4/5">
-        <PassageViewContent querySent={querySent} sectionIndex={sectionIndex} document={document} />
+        <PassageViewContent 
+          querySent={querySent} 
+          sectionIndex={sectionIndex} 
+          document={document}
+          sentence={sentence}
+        />
       </div>
       <div className="w-1/5">
         <div className="flex w-full flex-col md:flex-nowrap gap-4">
+          <p className='text-xs'>
+            Model: 
+            <a href='https://arxiv.org/pdf/2009.10053' 
+              className='hover:text-blue-500'
+              target="_blank" 
+              rel="noopener noreferrer"
+            > LatinBERT </a> 
+            (Bamman and Burns 2020)
+          </p>
           <Textarea 
             isMultiline
             size="lg"
@@ -81,20 +111,24 @@ export default function NearestNeighborQuery() {
             Submit
           </button>
           {loading ? <div>Loading...</div> : submittedText && (
-            <Card className="mt-4 p-4 bg-gray-100">
+            <Card className="mt-4 p-4 bg-gray-100 rounded-none">
               <p><strong>Query:</strong> {submittedText.queryText}</p>
               <p><strong>Target Word:</strong> {submittedText.targetWord}</p>
               <Divider className="my-4" />
               <ul>
                 { data.map((item, index) => (
-                  <li key={index}>
-                    <p className="text-sm">{item['token']} | {item['sentence']} | {item['document']}</p>
-                    <p className='text-xs'>Similarity: {item['score']}</p>
+                  <li key={index} className='pb-2'>
+                    <p className='text-xs font-semibold pt-1'>Text: {item['document']}</p>
+                    <p className="text-sm">{highlightTokenInSentence(item['sentence'], item['token'])}</p>
+                    <p className='text-xs font-semibold pt-1'>Similarity: {roundScore(item['score'])}</p>
                     {Number(item['section']) == sectionIndex ? 
-                      <button onClick={() => { setQuerySent(false); setSectionIndex(-1);}} className='text-xs'>
+                      <button onClick={() => { setQuerySent(false); setSectionIndex(-1); }} className='text-xs text-blue-500 hover:text-gray-500'>
                         Clear passage context
                       </button> :                     
-                      <button onClick={() => handleSectionSelect(item['section'], item['document'])} className='text-xs'>
+                      <button 
+                        onClick={() => handleSectionSelect(item['section'], item['document'], item['sentence'])} 
+                        className='text-xs text-blue-500 hover:text-gray-500'
+                      >
                         View in context
                       </button>
                     }

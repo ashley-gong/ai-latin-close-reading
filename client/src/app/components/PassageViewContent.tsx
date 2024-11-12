@@ -18,9 +18,10 @@ interface Props {
     value: string;
     label: string;
   };
+  sentence: string;
 }
 
-export default function PassageViewContent({ querySent, sectionIndex, document } : Props) {
+export default function PassageViewContent({ querySent, sectionIndex, document, sentence } : Props) {
   const [isDualView, setIsDualView] = useState(false);
   const [leftText, setLeftText] = useState({ value: "caesar_gall1.txt", label: "Caesar Gallic Wars Book 1" });
   const [rightText, setRightText] = useState({ value: "catullus.txt", label: "Catullus" });
@@ -103,27 +104,39 @@ export default function PassageViewContent({ querySent, sectionIndex, document }
 
       <main className="flex flex-col items-center space-y-4 w-2/3">
         {querySent ? 
-          <button onClick={() => console.log(querySections)} className="text-md font-bold">
+          <p className="text-md font-bold">
             Nearest Neighbor Query Context
-          </button> : 
+          </p> : 
           <button onClick={toggleDualView} className="p-2 bg-gray-500 hover:bg-gray-400 text-white rounded">
             {isDualView ? "Switch to Single View" : "Switch to Dual View"}
           </button>
         }
         <div className="flex w-full gap-8">
           <div className="flex-1">
-            <PassageView title={`${leftSections[leftIndex]?.title}: ${leftSections[leftIndex]?.indexLabel}`} content={leftSections[leftIndex]?.content || ""} />
+            <PassageView 
+              title={`${leftSections[leftIndex]?.title}: ${leftSections[leftIndex]?.indexLabel}`} 
+              content={leftSections[leftIndex]?.content || ""} 
+              highlight=""
+            />
           </div>
 
           {querySent &&
             <div className="flex-1">
-              <PassageView title={`${querySections[sectionIndex - 1]?.title}: ${querySections[sectionIndex - 1]?.indexLabel}`} content={querySections[sectionIndex - 1]?.content || ""} />
+              <PassageView 
+                title={`${querySections.find(i => Number(i.indexLabel) === sectionIndex)?.title}: ${querySections.find(i => Number(i.indexLabel) === sectionIndex)?.indexLabel}`} 
+                content={querySections.find(i => Number(i.indexLabel) === sectionIndex)?.content || ""} 
+                highlight={sentence}
+              />
             </div>
           }
 
           {!querySent && isDualView && 
             <div className="flex-1">
-              <PassageView title={`${rightSections[rightIndex]?.title}: ${rightSections[rightIndex]?.indexLabel}`} content={rightSections[rightIndex]?.content || ""} />
+              <PassageView 
+                title={`${rightSections[rightIndex]?.title}: ${rightSections[rightIndex]?.indexLabel}`} 
+                content={rightSections[rightIndex]?.content || ""} 
+                highlight=""
+              />
             </div>
           }
         </div>

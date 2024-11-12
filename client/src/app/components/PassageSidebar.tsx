@@ -38,7 +38,7 @@ export default function PassageSidebar(
         </button>
       }
       <div className="mb-4">
-        <ul className="space-y-2">
+        <ul className="space-y-2 h-64 overflow-y-auto">
           {textFiles.map((file) => (
             <li
               key={file.value}
@@ -52,7 +52,7 @@ export default function PassageSidebar(
           ))}
         </ul>
       </div>
-      <h3 className="font-semibold mb-2">Sections</h3>
+      <h3 className="font-semibold mb-2">Sections/Line Starts</h3>
       <ul className="space-y-2 bg-white p-4 shadow-md h-64 overflow-y-auto">
         {sections.map((section, index) => (
           <li
