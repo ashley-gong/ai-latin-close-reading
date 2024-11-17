@@ -20,7 +20,6 @@ export const query = async (dataToSend) => {
     }
 
     const data = await response.json();
-    console.log(data);
     return data;
   } catch (error) {
     console.error('Error:', error);

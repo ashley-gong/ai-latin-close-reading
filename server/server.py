@@ -42,13 +42,14 @@ def query_similarity():
     data = request.json
     query_text = data.get("queryText")
     target_word = data.get("targetWord")
+    num_results = int(data.get("numberResults")) if data.get("numberResults") != "" else 5
 
     target_embedding = get_target_embedding(query_text, target_word)
     target_embedding = target_embedding.tolist()
     if target_embedding is None:
         return jsonify({"error": "Target word not found in the sentence."}), 400
         
-    results = index.query(vector=target_embedding, top_k=5, include_metadata=True)
+    results = index.query(vector=target_embedding, top_k=num_results, include_metadata=True)
     output = []
     for match in results['matches']:      
       output.append({

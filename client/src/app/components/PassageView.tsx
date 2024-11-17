@@ -1,5 +1,6 @@
 // plan: box component displaying passage, sidebar of preloaded texts
 import { Card, CardBody, CardHeader } from "@nextui-org/react"
+import { useState } from "react";
 
 interface PassageViewProps {
   title: string;
@@ -9,8 +10,11 @@ interface PassageViewProps {
 
 export default function PassageView({title, content, highlight}: PassageViewProps) {
 
+  const [isScrollable, setIsScrollable] = useState(false);
+
   const processStringCompare = (part: string) => {
-    return part.replace(/\[\d+\]|\d+|\n/g, '').toLowerCase();
+    const escapedPart = part.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return escapedPart.replace(/\[\d+\]|\d+|\n+|\s+/g, '').toLowerCase();
   }
   
   const highlightSentenceInPassage = (sentence: string, passage: string) => {
@@ -32,13 +36,24 @@ export default function PassageView({title, content, highlight}: PassageViewProp
 
   return (
     <div>
-      <Card className="bg-slate-100 px-1 py-4 max-w-[50vh] flex flex-col" shadow="none" radius="none">
+      <Card 
+        className={isScrollable ? 
+          "bg-slate-100 px-1 py-4 max-w-[50vh] max-h-[70vh] overflow-y-auto flex flex-col" 
+          : "bg-slate-100 px-1 py-4 max-w-[50vh] flex flex-col"
+        } 
+        shadow="none" 
+        radius="none"
+      >
         <CardHeader>
           <h4 className="font-bold text-large">{title}</h4>
         </CardHeader>
         <CardBody className="overflow-y-auto whitespace-pre-wrap">
           <p className="text-m">{highlightSentenceInPassage(highlight, content)}</p> 
-          {/* highlightSentenceInPassage(highlight, content) */}
+          <button onClick={() => setIsScrollable(!isScrollable)}
+            className="text-xs hover:text-blue-500 p-2 justify-start"
+            >
+              { isScrollable ? "Remove Scroll" : "Make Scrollable" }
+          </button>
         </CardBody>
       </Card>
     </div>
