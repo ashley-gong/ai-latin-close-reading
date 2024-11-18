@@ -1,18 +1,11 @@
 "use client";
 
-import { Accordion, AccordionItem, Card, Divider } from "@nextui-org/react";
+import { Accordion, AccordionItem, Card, Divider, Tab, Tabs } from "@nextui-org/react";
 import { textFiles } from "../../../utils/constants";
 import { useState } from "react";
 import { useTextSectionContext } from "../contexts/TextSectionContext";
 import PassageView from "./PassageView";
-
-interface ResultItem {
-  document: string;
-  section: string;
-  sentence: string;
-  token: string;
-  score: number;
-}
+import AlignedResult from "./AlignedResult";
 
 interface ResultsCardProps {
   data: ResultItem[];
@@ -84,36 +77,43 @@ export default function ResultsCard({
           <p><strong>Query Context:</strong> {submittedText?.queryText}</p>
           <p><strong>Target Word:</strong> {submittedText?.targetWord}</p>
           <Divider className="my-4" />
-          <Accordion selectionMode="multiple">
-            {data.map((item, index) => (
-              <AccordionItem
-                key={index}
-                title={ // Number(item['section']) !== sectionIndex &&
-                  <p className="text-xs font-semibold py-1">
-                    {textFiles.find(text => text.value === item.document)?.label}: {item.section}
-                  </p>
-                }
-                subtitle={ // Number(item['section']) !== sectionIndex &&
-                  <div>
-                    <p className="text-sm">{highlightTokenInSentence(item.sentence, item.token)}</p>
-                    <p className="text-xs font-semibold pt-1">Similarity: {roundScore(item.score)}</p>
-                  </div>
-                }
-                textValue={`${textFiles.find(text => text.value === item.document)?.label}: ${item.section}`}
-                onPress={() => handleAccordionToggle(item.section, item.document, index)}
-              >
-                {itemStates[index]?.content ? (
-                  <PassageView
-                    title={`${itemStates[index].title}: ${item.section}`}
-                    content={itemStates[index].content}
-                    highlight={item.sentence}
-                  />
-                ) : (
-                  <p>Loading content...</p>
-                )}
-              </AccordionItem>
-            ))}
-          </Accordion>
+          <Tabs aria-label="Options" variant="underlined">
+            <Tab key="results" title="Full Results">
+              <Accordion selectionMode="multiple">
+                {data.map((item, index) => (
+                  <AccordionItem
+                    key={index}
+                    title={ // Number(item['section']) !== sectionIndex &&
+                      <p className="text-xs font-semibold py-1">
+                        {textFiles.find(text => text.value === item.document)?.label}: {item.section}
+                      </p>
+                    }
+                    subtitle={ // Number(item['section']) !== sectionIndex &&
+                      <div>
+                        <p className="text-sm">{highlightTokenInSentence(item.sentence, item.token)}</p>
+                        <p className="text-xs font-semibold pt-1">Similarity: {roundScore(item.score)}</p>
+                      </div>
+                    }
+                    textValue={`${textFiles.find(text => text.value === item.document)?.label}: ${item.section}`}
+                    onPress={() => handleAccordionToggle(item.section, item.document, index)}
+                  >
+                    {itemStates[index]?.content ? (
+                      <PassageView
+                        title={`${itemStates[index].title}: ${item.section}`}
+                        content={itemStates[index].content}
+                        highlight={item.sentence}
+                      />
+                    ) : (
+                      <p>Loading content...</p>
+                    )}
+                  </AccordionItem>
+                ))}
+              </Accordion>
+            </Tab>
+            <Tab key="aligned" title="Aligned Results">
+              <AlignedResult results={data} />
+            </Tab>
+          </Tabs>
         </Card>
         : 
         <button onClick={onToggleDisplay} className='text-sm text-blue-500 hover:text-gray-500'>

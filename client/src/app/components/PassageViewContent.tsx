@@ -110,12 +110,14 @@ export default function PassageViewContent({ querySent, querySentence, children 
             </div> }     
         </div>
         <div className="flex w-full gap-8">
-          <div className="flex-1">
-            <PassageView 
-              title={`${leftSections[leftIndex]?.title}: ${leftSections[leftIndex]?.indexLabel}`} 
-              content={leftSections[leftIndex]?.content || ""} 
-              highlight={querySentence}
-            />
+          <div className="flex-1 relative">
+            <div className="sticky top-8">
+              <PassageView
+                title={`${leftSections[leftIndex]?.title}: ${leftSections[leftIndex]?.indexLabel}`} 
+                content={leftSections[leftIndex]?.content || ""} 
+                highlight={querySentence}
+              />
+            </div>
           </div>
 
           {/* {querySent &&

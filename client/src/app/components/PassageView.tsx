@@ -1,4 +1,5 @@
-// plan: box component displaying passage, sidebar of preloaded texts
+"use client"
+
 import { Card, CardBody, CardHeader } from "@nextui-org/react"
 import { useState } from "react";
 
@@ -44,16 +45,16 @@ export default function PassageView({title, content, highlight}: PassageViewProp
         shadow="none" 
         radius="none"
       >
-        <CardHeader>
+        <CardHeader className="flex flex-col gap-2 items-start">
           <h4 className="font-bold text-large">{title}</h4>
+          <button onClick={() => setIsScrollable(!isScrollable)}
+            className="text-xs text-gray-500 hover:text-blue-500"
+          >
+            { isScrollable ? "Remove Scroll" : "Make Scrollable" }
+          </button>
         </CardHeader>
         <CardBody className="overflow-y-auto whitespace-pre-wrap">
           <p className="text-m">{highlightSentenceInPassage(highlight, content)}</p> 
-          <button onClick={() => setIsScrollable(!isScrollable)}
-            className="text-xs hover:text-blue-500 p-2 justify-start"
-            >
-              { isScrollable ? "Remove Scroll" : "Make Scrollable" }
-          </button>
         </CardBody>
       </Card>
     </div>

@@ -5,6 +5,7 @@ import { Textarea, Input } from "@nextui-org/react";
 import { query } from '../../../utils/api';
 import PassageViewContent from './PassageViewContent';
 import ResultsCard from './ResultsCard';
+import { highlightTokenInSentence } from '../../../utils/utils';
 
 
 export default function NearestNeighborQuery() {
@@ -42,19 +43,6 @@ export default function NearestNeighborQuery() {
     setTargetWord('');
     setLoading(false);
     setDoneLoading(false);
-  };
-
-  const highlightTokenInSentence = (sentence: string, token: string) => {
-    const escapedToken = token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const regex = new RegExp(`(\\b${escapedToken}\\b)`, 'gi');
-    const parts = sentence.split(regex);   
-    return parts.map((part, index) =>
-      part.toLowerCase() === token.toLowerCase() ? (
-        <span key={index} className="bg-blue-300">{part}</span>
-      ) : (
-        part
-      )
-    );
   };
 
   const roundScore = (score: number) => {

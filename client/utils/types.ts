@@ -4,3 +4,11 @@ interface Section {
   indexLabel: string;
   content: string;
 }
+
+interface ResultItem {
+  document: string;
+  section: string;
+  sentence: string;
+  token: string;
+  score: number;
+}
