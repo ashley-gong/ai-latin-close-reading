@@ -30,7 +30,7 @@ export default function AlignedResult(data: Props) {
                 ...{truncateWords(splitByToken(item.sentence, item.token)[0] || '', 4, true)}
               </span>
               <div className="flex text-left w-1/2 items-center text-sm min-w-0">
-                <span className="bg-blue-300 font-semibold whitespace-nowrap text-left text-sm">
+                <span className="bg-blue-200 font-semibold whitespace-nowrap text-left text-sm">
                   {splitByToken(item.sentence, item.token)[1]}
                 </span>
                 <span className="truncate text-left pl-1 text-sm">
