@@ -18,3 +18,10 @@ body {
     text-wrap: balance;
   }
 }
+
+.truncate-start {
+  direction: rtl; /* Switch text direction to right-to-left */
+  text-overflow: ellipsis; /* Add ellipsis for overflow */
+  white-space: nowrap; /* Prevent wrapping */
+  overflow: hidden; /* Hide overflowing text */
+}

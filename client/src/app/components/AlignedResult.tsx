@@ -26,15 +26,15 @@ export default function AlignedResult(data: Props) {
             </div>
 
             <div className="flex flex-row items-center w-5/6">
-              <span className="truncate text-right w-1/2 pr-1 text-sm whitespace-nowrap">
-                ...{truncateWords(splitByToken(item.sentence, item.token)[0] || '', 4, true)}
+              <span className="text-right w-1/2 pr-1 text-sm truncate-start">
+                {truncateWords(splitByToken(item.sentence, item.token)[0] || '', 4, true)}...
               </span>
               <div className="flex text-left w-1/2 items-center text-sm min-w-0">
-                <span className="bg-blue-200 font-semibold whitespace-nowrap text-left text-sm">
+                <span className="bg-blue-200 font-semibold whitespace-nowrap text-left">
                   {splitByToken(item.sentence, item.token)[1]}
                 </span>
-                <span className="truncate text-left pl-1 text-sm">
-                  {truncateWords(splitByToken(item.sentence, item.token)[2] || '', 4, false)}
+                <span className="text-left pl-1 truncate">
+                  {truncateWords(splitByToken(item.sentence, item.token)[2] || '', 4, false)}...
                 </span>
               </div>
             </div>
