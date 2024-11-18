@@ -2,12 +2,6 @@
 
 import React, { createContext, useContext, useState, ReactNode, useCallback } from "react";
 
-interface Section {
-  title: string;
-  indexLabel: string;
-  content: string;
-}
-
 interface TextSectionContextProps {
   leftText: { value: string; label: string };
   setLeftText: (value: { value: string; label: string }) => void;

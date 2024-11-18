@@ -1,11 +1,5 @@
 "use client";
 
-interface Section {
-  title: string;
-  indexLabel: string;
-  content: string;
-}
-
 interface SidebarProps {
   isDualView: boolean;
   textFiles: { label: string; value: string }[];

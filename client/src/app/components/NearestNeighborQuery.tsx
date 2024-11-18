@@ -21,6 +21,7 @@ export default function NearestNeighborQuery() {
     setSubmittedText({ queryText, targetWord });
     setLoading(true);
     setDoneLoading(false);
+    console.log("loading");
     const dataToSend = { targetWord: targetWord, queryText: queryText, numberResults: numberResults };
     try {
       setLoading(true);
@@ -32,22 +33,16 @@ export default function NearestNeighborQuery() {
       setLoading(false);
       setDoneLoading(true);
       setDisplayResults(true);
+      console.log("done");
     }
   };
 
   const handleClear = () => {
     setQueryText('');
     setTargetWord('');
+    setLoading(false);
+    setDoneLoading(false);
   };
-
-  // const handleSectionSelect = (currSection: string, currDocument: string, currSentence: string) => {
-  //   setSectionIndex(Number(currSection));
-  //   setResultSentence(currSentence);
-  //   const currText = textFiles.find(text => text.value === currDocument);
-  //   if (currText) {
-  //     setDocument(currText);
-  //   }
-  // }
 
   const highlightTokenInSentence = (sentence: string, token: string) => {
     const escapedToken = token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -74,7 +69,7 @@ export default function NearestNeighborQuery() {
         <PassageViewContent 
           querySent={doneLoading} 
           querySentence={queryText}>
-            {loading ? <div>Loading...</div> : submittedText && (
+            {submittedText && (
               <ResultsCard
                 data={data}
                 submittedText={submittedText}
@@ -137,17 +132,18 @@ export default function NearestNeighborQuery() {
           <div className='flex flex-row gap-4'>
             <button 
               onClick={handleSubmit} 
-              className="w-1/2 p-2 bg-gray-500 hover:bg-gray-400 text-white rounded"
+              className="w-1/2 p-2 bg-blue-500 hover:bg-blue-300 text-white rounded"
             >
               Submit
             </button>
             <button 
               onClick={handleClear} 
-              className="w-1/2 p-2 hover:text-red-600"
+              className="w-1/2 p-2 text-red-600 hover:text-red-900"
             >
-              Clear Query
+              Clear Query (and Results)
             </button>
           </div>
+          {loading ? <div>Loading...</div> : (doneLoading && <div>Done!</div>)}
         </div>
       </div>
     </div>

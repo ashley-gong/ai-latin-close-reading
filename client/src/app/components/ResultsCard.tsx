@@ -2,7 +2,7 @@
 
 import { Accordion, AccordionItem, Card, Divider } from "@nextui-org/react";
 import { textFiles } from "../../../utils/constants";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTextSectionContext } from "../contexts/TextSectionContext";
 import PassageView from "./PassageView";
 
@@ -32,39 +32,55 @@ export default function ResultsCard({
   roundScore,
 }: ResultsCardProps) {
 
-  const [sectionInContext, setSectionInContext] = useState(false);
-  const [resultSentence, setResultSentence] = useState('');
-  const [sectionIndex, setSectionIndex] = useState(-1);
-  const [document, setDocument] = useState({ value: "", label: "" });
-  const { querySections, setQuerySections, loadSections } = useTextSectionContext();
+  const [isScrollable, setIsScrollable] = useState(false);
+  const [itemStates, setItemStates] = useState<Record<string, Section>>({});
+  const { loadSections } = useTextSectionContext();
 
-  useEffect(() => {
-    loadSections(document.value, document.label)
-    .then(setQuerySections)
-    .catch(console.error);
-  }, [document.value, document.label, loadSections, setQuerySections]);
+  const handleAccordionToggle = async (section: string, document: string, index: number) => {
+    if (!itemStates[index]?.content) {
+      const currText = textFiles.find((text) => text.value === document);
+      if (currText) {
+        const loadedSections = await loadSections(currText.value, currText.label);
+        const sectionContent = loadedSections.find((sec) => sec.indexLabel === section)?.content || "";
 
-  const handleSectionSelect = (currSection: string, currDocument: string, currSentence: string) => {
-    setSectionIndex(Number(currSection));
-    setResultSentence(currSentence);
-    const currText = textFiles.find(text => text.value === currDocument);
-    if (currText) {
-      setDocument(currText);
+        setItemStates((prev) => ({
+          ...prev,
+          [index]: {
+            title: currText.label,
+            indexLabel: section,
+            content: sectionContent,
+          },
+        }));
+      }
     }
-  }
+  };
 
-  const cardClass = sectionInContext 
-    ? "bg-slate-100 p-4 max-w-[50vh] max-h-[100vh] overflow-y-auto flex flex-col" 
+  const cardClass = isScrollable ? 
+    "bg-slate-100 p-4 max-w-[50vh] max-h-[70vh] overflow-y-auto flex flex-col" 
     : "bg-slate-100 p-4 max-w-[50vh] flex flex-col" ;
+
+  const cardButtons = 
+    displayResults ?
+      <div className='flex flex-row gap-4 justify-center'>
+        <button onClick={onToggleDisplay} className="text-sm text-blue-500 hover:text-gray-500 pb-4">
+          Hide Results
+        </button>
+        <button onClick={() => setIsScrollable(!isScrollable)}
+          className="text-sm text-blue-500 hover:text-gray-500 pb-4">
+          { isScrollable ? "Remove Scroll" : "Make Scrollable" }
+        </button>
+      </div>
+    : 
+    <button onClick={onToggleDisplay} className="text-sm text-blue-500 hover:text-gray-500 pb-4">
+      Show Results
+    </button>
+
 
   return (
     <div>
       { displayResults ? 
-        // <Card className="" > "mt-4 p-4 bg-slate-100 rounded-none max-h-[70vh] overflow-y-auto">
         <Card className={cardClass} shadow="none" radius="none">
-          <button onClick={onToggleDisplay} className="text-sm text-blue-500 hover:text-gray-500 pb-4">
-            {displayResults ? "Hide Results" : "Show Results"}
-          </button>
+          {cardButtons}
           <p><strong>Query Context:</strong> {submittedText?.queryText}</p>
           <p><strong>Target Word:</strong> {submittedText?.targetWord}</p>
           <Divider className="my-4" />
@@ -74,7 +90,7 @@ export default function ResultsCard({
                 key={index}
                 title={ // Number(item['section']) !== sectionIndex &&
                   <p className="text-xs font-semibold py-1">
-                    {textFiles.find(text => text.value === item['document'])?.label}: {item['section']}
+                    {textFiles.find(text => text.value === item.document)?.label}: {item.section}
                   </p>
                 }
                 subtitle={ // Number(item['section']) !== sectionIndex &&
@@ -83,14 +99,18 @@ export default function ResultsCard({
                     <p className="text-xs font-semibold pt-1">Similarity: {roundScore(item.score)}</p>
                   </div>
                 }
-                onPress={() => {handleSectionSelect(item.section, item.document, item.sentence); setSectionInContext(true)}}
-                onBlur={() => {setSectionIndex(-1); setSectionInContext(false)}}
-            >
-              <PassageView 
-                title={`${querySections.find(i => Number(i.indexLabel) === sectionIndex)?.title}: ${querySections.find(i => Number(i.indexLabel) === sectionIndex)?.indexLabel}`} 
-                content={querySections.find(i => Number(i.indexLabel) === sectionIndex)?.content || ""} 
-                highlight={resultSentence}
-              />
+                textValue={`${textFiles.find(text => text.value === item.document)?.label}: ${item.section}`}
+                onPress={() => handleAccordionToggle(item.section, item.document, index)}
+              >
+                {itemStates[index]?.content ? (
+                  <PassageView
+                    title={`${itemStates[index].title}: ${item.section}`}
+                    content={itemStates[index].content}
+                    highlight={item.sentence}
+                  />
+                ) : (
+                  <p>Loading content...</p>
+                )}
               </AccordionItem>
             ))}
           </Accordion>
