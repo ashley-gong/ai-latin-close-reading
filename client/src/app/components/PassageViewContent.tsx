@@ -8,40 +8,15 @@ import { useTextSectionContext } from "../contexts/TextSectionContext";
 
 interface Props {
   querySent: boolean;
-  sectionIndex: number;
-  document: {
-    value: string;
-    label: string;
-  };
-  resultSentence: string;
   querySentence: string;
   children?: React.ReactNode;
 }
 
-export default function PassageViewContent({ querySent, sectionIndex, document, resultSentence, querySentence, children } : Props) {
-  const [isDualView, setIsDualView] = useState(false);
-  // const [leftText, setLeftText] = useState({ value: "caesar_gall1.txt", label: "Caesar Gallic Wars Book 1" });
-  // const [rightText, setRightText] = useState({ value: "catullus.txt", label: "Catullus" });
-  // const [leftSections, setLeftSections] = useState<Section[]>([]);
-  // const [rightSections, setRightSections] = useState<Section[]>([]);
+export default function PassageViewContent({ querySent, querySentence, children } : Props) {
+  const [isDualView, setIsDualView] = useState(querySent);
   const [leftIndex, setLeftIndex] = useState(0);
   const [rightIndex, setRightIndex] = useState(0);
   const [isLeftSidebarVisible, setIsLeftSidebarVisible] = useState(true);
-  // const [querySections, setQuerySections] = useState<Section[]>([]);
-
-  // const loadSections = async (textFile: string, textTitle: string): Promise<Section[]> => {
-  //   const response = await fetch(`/${textFile}`);
-  //   if (!response.ok) throw new Error("Failed to load file");
-  //   const text = await response.text();
-  //   const numberedSections = text.match(/\[\s*\d+\s*\][\s\S]*?(?=\[\s*\d+\s*\]|$)/g) || [];
-  //   return numberedSections.map((section, i) => {
-  //     const indexLabelMatch = section.match(/\[\s*(\d+)\s*\]/);
-  //     const title = textTitle;
-  //     const indexLabel = indexLabelMatch ? `${indexLabelMatch[1]}` : `${i + 1}`;
-  //     const content = section; //.replace(/\[\s*\d+\s*\]/, "").trim();
-  //     return { title, indexLabel, content };
-  //   });
-  // };
 
   const {
     leftText,
@@ -52,8 +27,6 @@ export default function PassageViewContent({ querySent, sectionIndex, document, 
     setRightText,
     rightSections,
     setRightSections,
-    querySections,
-    setQuerySections,
     loadSections,
   } = useTextSectionContext();
 
@@ -68,12 +41,6 @@ export default function PassageViewContent({ querySent, sectionIndex, document, 
       .then(setRightSections)
       .catch(console.error);
   }, [loadSections, rightText, setRightSections]);
-
-  useEffect(() => {
-    loadSections(document.value, document.label)
-    .then(setQuerySections)
-    .catch(console.error);
-  }, [querySent, document.value, document.label, loadSections, setQuerySections]);
 
   const toggleSidebar = () => {
     setIsLeftSidebarVisible(!isLeftSidebarVisible);
@@ -100,7 +67,7 @@ export default function PassageViewContent({ querySent, sectionIndex, document, 
 
   // TODO eventually have the main view be a tab selector, want cluster graphs too
   return (
-    <div className="flex min-h-screen gap-4">
+    <div className="flex min-h-screen gap-1">
 
       {!isLeftSidebarVisible && isDualView && !querySent ? (
         <PassageSidebar
@@ -128,17 +95,12 @@ export default function PassageViewContent({ querySent, sectionIndex, document, 
         />
       )}
 
-      <main className="flex flex-col items-center space-y-4 w-2/3">
+      <main className="flex flex-col items-center space-y-4 w-5/6">
         <div className="flex flex-col gap-2 items-center">
           <div className="row-start-1">
-            {querySent ? 
-              <p className="text-md font-bold">
-                Nearest Neighbor Query Context
-              </p> : 
-              <button onClick={toggleDualView} className="p-2 bg-gray-500 hover:bg-gray-400 text-white rounded">
-                {isDualView ? "Switch to Single View" : "Switch to Dual View"}
-              </button>
-            }
+            <button onClick={toggleDualView} className="p-2 bg-gray-500 hover:bg-gray-400 text-white rounded">
+              {isDualView ? "Switch to Single/Query View" : "Switch to Dual View"}
+            </button>
           </div>
           {isDualView && !querySent && 
             <div className='row-start-2'>
@@ -147,16 +109,18 @@ export default function PassageViewContent({ querySent, sectionIndex, document, 
               </button>
             </div> }     
         </div>
-        <div className="flex w-full gap-8">
-          <div className="flex-1">
-            <PassageView 
-              title={`${leftSections[leftIndex]?.title}: ${leftSections[leftIndex]?.indexLabel}`} 
-              content={leftSections[leftIndex]?.content || ""} 
-              highlight={querySentence}
-            />
+        <div className="flex w-full gap-1">
+          <div className="flex-1 relative">
+            <div className="sticky top-8">
+              <PassageView
+                title={`${leftSections[leftIndex]?.title}: ${leftSections[leftIndex]?.indexLabel}`} 
+                content={leftSections[leftIndex]?.content || ""} 
+                highlight={querySentence}
+              />
+            </div>
           </div>
 
-          {querySent &&
+          {/* {querySent &&
             <div className="flex-1">
               <PassageView 
                 title={`${querySections.find(i => Number(i.indexLabel) === sectionIndex)?.title}: ${querySections.find(i => Number(i.indexLabel) === sectionIndex)?.indexLabel}`} 
@@ -164,15 +128,15 @@ export default function PassageViewContent({ querySent, sectionIndex, document, 
                 highlight={resultSentence}
               />
             </div>
-          }
+          } */}
 
-          {!isDualView &&
+          {querySent && !isDualView &&
             <div className="flex-1">
               {children}
             </div>
           }    
 
-          {!querySent && isDualView && 
+          {isDualView && 
             <div className="flex-1">
               <PassageView 
                 title={`${rightSections[rightIndex]?.title}: ${rightSections[rightIndex]?.indexLabel}`} 

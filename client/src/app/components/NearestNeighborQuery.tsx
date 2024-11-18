@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { Textarea, Input } from "@nextui-org/react";
 import { query } from '../../../utils/api';
 import PassageViewContent from './PassageViewContent';
-import { textFiles } from '../../../utils/constants';
 import ResultsCard from './ResultsCard';
 
 
@@ -15,54 +14,36 @@ export default function NearestNeighborQuery() {
   const [displayResults, setDisplayResults] = useState(true);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [sectionIndex, setSectionIndex] = useState(-1);
-  const [querySent, setQuerySent] = useState(false);
-  const [document, setDocument] = useState({ value: "", label: "" });
-  const [resultSentence, setResultSentence] = useState('');
+  const [doneLoading, setDoneLoading] = useState(false);
   const [numberResults, setNumberResults] = useState('');
+  const [queryError, setQueryError] = useState(false);
 
   const handleSubmit = async () => {
+    console.log(queryText);
+    console.log(targetWord);
     setSubmittedText({ queryText, targetWord });
     setLoading(true);
+    setDoneLoading(false);
     const dataToSend = { targetWord: targetWord, queryText: queryText, numberResults: numberResults };
     try {
       setLoading(true);
       const responseData = await query(dataToSend);
       setData(responseData);
-    } catch (error) {
-      console.error("Error:", error);
-    } finally {
+      setDoneLoading(true);
       setLoading(false);
       setDisplayResults(true);
+    } catch (error) {
+      console.error("Error:", error);
+      setQueryError(true);
+      setLoading(false);
     }
   };
 
   const handleClear = () => {
     setQueryText('');
     setTargetWord('');
-  };
-
-  const handleSectionSelect = (currSection: string, currDocument: string, currSentence: string) => {
-    setSectionIndex(Number(currSection));
-    setResultSentence(currSentence);
-    const currText = textFiles.find(text => text.value === currDocument);
-    if (currText) {
-      setDocument(currText);
-    }
-    setQuerySent(true);
-  }
-
-  const highlightTokenInSentence = (sentence: string, token: string) => {
-    const escapedToken = token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const regex = new RegExp(`(\\b${escapedToken}\\b)`, 'gi');
-    const parts = sentence.split(regex);   
-    return parts.map((part, index) =>
-      part.toLowerCase() === token.toLowerCase() ? (
-        <span key={index} className="bg-blue-300">{part}</span>
-      ) : (
-        part
-      )
-    );
+    setLoading(false);
+    setDoneLoading(false);
   };
 
   const roundScore = (score: number) => {
@@ -71,35 +52,37 @@ export default function NearestNeighborQuery() {
     return lowerBoundedScore.toFixed(3);
   }
 
+  const resultMessage = () => {
+    if (loading) {
+      return <div>Loading...</div> 
+    } else {
+      if (doneLoading) {
+        return <div>Done! View results in single/query view.</div>
+      } else if (queryError) {
+        return <div>Failed to fetch! Double check your query and target word such that neither are empty and your target word appears in your query.</div>
+      } 
+    }
+  }
+
   return (
-    <div className="flex flex-row row-start-2 items-start sm:items-start gap-4 w-full">
-      <div className="w-4/5">
+    <div className="flex flex-row row-start-2 items-start sm:items-start gap-1 w-full">
+      <div className="w-5/6">
         <PassageViewContent 
-          querySent={querySent} 
-          sectionIndex={sectionIndex} 
-          document={document}
-          resultSentence={resultSentence}
+          querySent={doneLoading} 
           querySentence={queryText}>
             {submittedText && (
               <ResultsCard
                 data={data}
                 submittedText={submittedText}
-                sectionIndex={sectionIndex}
                 displayResults={displayResults}
                 onToggleDisplay={() => setDisplayResults(!displayResults)}
-                onSectionSelect={handleSectionSelect}
-                onClearContext={() => {
-                  setQuerySent(false);
-                  setSectionIndex(-1);
-                }}
-                highlightTokenInSentence={highlightTokenInSentence}
                 roundScore={roundScore}
               />
             )}
           </PassageViewContent>
       </div>
-      <div className="w-1/5">
-        <div className="flex w-full flex-col md:flex-nowrap gap-4">
+      <div className="w-1/6">
+        <div className="flex flex-col md:flex-nowrap gap-y-4">
           <h1 className="font-semibold text-xl">Contextual Nearest Neighbors Queries</h1>
           <p className='text-xs'>
             Model: 
@@ -115,7 +98,8 @@ export default function NearestNeighborQuery() {
             size="lg"
             label="Query"
             placeholder=
-              "Enter the phrase/sentence in which your target word appears. (Highlight from left text for best results."
+              "Enter the phrase/sentence in which your target word appears."
+            description="Highlight from left text for best results."
             className="max-w-lg text-sm"
             radius="none"
             variant="bordered"
@@ -128,6 +112,7 @@ export default function NearestNeighborQuery() {
             type="text"
             variant="underlined"
             placeholder="Target word"
+            description="Enter the word for which you want to find similar usages."
             radius="none"
             className="max-w-lg"
             value={targetWord}
@@ -139,7 +124,8 @@ export default function NearestNeighborQuery() {
             size="lg"
             type="text"
             variant="underlined"
-            placeholder="# of Results (Default is 5)"
+            placeholder="Number of Results"
+            description="The default number (if this field is left empty) is 5."
             radius="none"
             className="max-w-lg"
             value={numberResults}
@@ -149,57 +135,18 @@ export default function NearestNeighborQuery() {
           <div className='flex flex-row gap-4'>
             <button 
               onClick={handleSubmit} 
-              className="w-1/2 p-2 bg-gray-500 hover:bg-gray-400 text-white rounded"
+              className="w-1/2 p-2 bg-blue-500 hover:bg-blue-300 text-white text-sm rounded"
             >
               Submit
             </button>
             <button 
               onClick={handleClear} 
-              className="w-1/2 p-2 hover:text-red-600"
+              className="w-1/2 p-2 text-red-600 hover:text-red-900 text-sm"
             >
-              Clear Query
+              Clear Query (and Results)
             </button>
           </div>
-          {loading ? (
-            <div>Loading...</div>
-          ) : (
-            null
-          )}
-          {/* {loading ? <div>Loading...</div> : (submittedText && displayResults ?
-            (<Card className="mt-4 p-4 bg-slate-100 rounded-none max-h-[70vh] overflow-y-auto">
-              <button onClick={() => setDisplayResults(false)} className='text-sm text-blue-500 hover:text-gray-500 pb-4'>
-                Hide Results
-              </button>
-              <p><strong>Query Context:</strong> {submittedText.queryText}</p>
-              <p><strong>Target Word:</strong> {submittedText.targetWord}</p>
-              <Divider className="my-4" />
-              <ul>
-                { data.map((item, index) => (
-                  <li key={index} className='pb-2'>
-                    <p className='text-xs font-semibold py-1'>
-                      {textFiles.find(text => text.value === item['document'])?.label}: {item['section']}
-                    </p>
-                    <p className="text-sm">{highlightTokenInSentence(item['sentence'], item['token'])}</p>
-                    <p className='text-xs font-semibold pt-1'>Similarity: {roundScore(item['score'])}</p>
-                    {Number(item['section']) == sectionIndex ? 
-                      <button onClick={() => { setQuerySent(false); setSectionIndex(-1); }} className='text-xs text-blue-500 hover:text-gray-500'>
-                        Clear passage context
-                      </button> :                     
-                      <button 
-                        onClick={() => handleSectionSelect(item['section'], item['document'], item['sentence'])} 
-                        className='text-xs text-blue-500 hover:text-gray-500'
-                      >
-                        View in context
-                      </button>
-                    }
-                  </li>))
-                }
-              </ul>
-            </Card>) :
-            <button onClick={() => setDisplayResults(true)} className='text-sm text-blue-500 hover:text-gray-500'>
-              Show Results
-            </button>
-            )} */}
+          {resultMessage()}
         </div>
       </div>
     </div>

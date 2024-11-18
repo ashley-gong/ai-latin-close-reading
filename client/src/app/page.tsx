@@ -5,7 +5,7 @@ import { TextSectionProvider } from "./contexts/TextSectionContext";
 export default function Home() {
 
   return (
-    <div className="grid items-center justify-items-center min-h-screen p-8 pb-20 gap-8 sm:p-16 font-[family-name:var(--font-geist-sans)]">
+    <div className="grid items-center justify-items-center min-h-screen p-8 pb-20 gap-4 sm:p-16 font-[family-name:var(--font-geist-sans)]">
       <TextSectionProvider>
         <Navbar position="static" className="items-start justify-start">
           <NavbarBrand>
