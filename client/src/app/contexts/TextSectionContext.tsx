@@ -22,10 +22,8 @@ interface TextSectionContextProps {
   loadSections: (textFile: string, textTitle: string) => Promise<Section[]>;
 }
 
-// Default values for the context
 const TextSectionContext = createContext<TextSectionContextProps | undefined>(undefined);
 
-// Provider component
 export const TextSectionProvider = ({ children }: { children: ReactNode }) => {
   const [leftText, setLeftText] = useState({ value: "caesar_gall1.txt", label: "Caesar Gallic Wars Book 1" });
   const [rightText, setRightText] = useState({ value: "catullus.txt", label: "Catullus" });

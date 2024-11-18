@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { Textarea, Input } from "@nextui-org/react";
 import { query } from '../../../utils/api';
 import PassageViewContent from './PassageViewContent';
-import { textFiles } from '../../../utils/constants';
 import ResultsCard from './ResultsCard';
 
 
@@ -15,15 +14,13 @@ export default function NearestNeighborQuery() {
   const [displayResults, setDisplayResults] = useState(true);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [sectionIndex, setSectionIndex] = useState(-1);
-  const [querySent, setQuerySent] = useState(false);
-  const [document, setDocument] = useState({ value: "", label: "" });
-  const [resultSentence, setResultSentence] = useState('');
+  const [doneLoading, setDoneLoading] = useState(false);
   const [numberResults, setNumberResults] = useState('');
 
   const handleSubmit = async () => {
     setSubmittedText({ queryText, targetWord });
     setLoading(true);
+    setDoneLoading(false);
     const dataToSend = { targetWord: targetWord, queryText: queryText, numberResults: numberResults };
     try {
       setLoading(true);
@@ -33,6 +30,7 @@ export default function NearestNeighborQuery() {
       console.error("Error:", error);
     } finally {
       setLoading(false);
+      setDoneLoading(true);
       setDisplayResults(true);
     }
   };
@@ -42,15 +40,14 @@ export default function NearestNeighborQuery() {
     setTargetWord('');
   };
 
-  const handleSectionSelect = (currSection: string, currDocument: string, currSentence: string) => {
-    setSectionIndex(Number(currSection));
-    setResultSentence(currSentence);
-    const currText = textFiles.find(text => text.value === currDocument);
-    if (currText) {
-      setDocument(currText);
-    }
-    setQuerySent(true);
-  }
+  // const handleSectionSelect = (currSection: string, currDocument: string, currSentence: string) => {
+  //   setSectionIndex(Number(currSection));
+  //   setResultSentence(currSentence);
+  //   const currText = textFiles.find(text => text.value === currDocument);
+  //   if (currText) {
+  //     setDocument(currText);
+  //   }
+  // }
 
   const highlightTokenInSentence = (sentence: string, token: string) => {
     const escapedToken = token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -72,26 +69,17 @@ export default function NearestNeighborQuery() {
   }
 
   return (
-    <div className="flex flex-row row-start-2 items-start sm:items-start gap-4 w-full">
+    <div className="flex flex-row row-start-2 items-start sm:items-start w-full">
       <div className="w-4/5">
         <PassageViewContent 
-          querySent={querySent} 
-          sectionIndex={sectionIndex} 
-          document={document}
-          resultSentence={resultSentence}
+          querySent={doneLoading} 
           querySentence={queryText}>
-            {submittedText && (
+            {loading ? <div>Loading...</div> : submittedText && (
               <ResultsCard
                 data={data}
                 submittedText={submittedText}
-                sectionIndex={sectionIndex}
                 displayResults={displayResults}
                 onToggleDisplay={() => setDisplayResults(!displayResults)}
-                onSectionSelect={handleSectionSelect}
-                onClearContext={() => {
-                  setQuerySent(false);
-                  setSectionIndex(-1);
-                }}
                 highlightTokenInSentence={highlightTokenInSentence}
                 roundScore={roundScore}
               />
@@ -99,7 +87,7 @@ export default function NearestNeighborQuery() {
           </PassageViewContent>
       </div>
       <div className="w-1/5">
-        <div className="flex w-full flex-col md:flex-nowrap gap-4">
+        <div className="flex w-full flex-col md:flex-nowrap gap-y-4">
           <h1 className="font-semibold text-xl">Contextual Nearest Neighbors Queries</h1>
           <p className='text-xs'>
             Model: 
@@ -160,46 +148,6 @@ export default function NearestNeighborQuery() {
               Clear Query
             </button>
           </div>
-          {loading ? (
-            <div>Loading...</div>
-          ) : (
-            null
-          )}
-          {/* {loading ? <div>Loading...</div> : (submittedText && displayResults ?
-            (<Card className="mt-4 p-4 bg-slate-100 rounded-none max-h-[70vh] overflow-y-auto">
-              <button onClick={() => setDisplayResults(false)} className='text-sm text-blue-500 hover:text-gray-500 pb-4'>
-                Hide Results
-              </button>
-              <p><strong>Query Context:</strong> {submittedText.queryText}</p>
-              <p><strong>Target Word:</strong> {submittedText.targetWord}</p>
-              <Divider className="my-4" />
-              <ul>
-                { data.map((item, index) => (
-                  <li key={index} className='pb-2'>
-                    <p className='text-xs font-semibold py-1'>
-                      {textFiles.find(text => text.value === item['document'])?.label}: {item['section']}
-                    </p>
-                    <p className="text-sm">{highlightTokenInSentence(item['sentence'], item['token'])}</p>
-                    <p className='text-xs font-semibold pt-1'>Similarity: {roundScore(item['score'])}</p>
-                    {Number(item['section']) == sectionIndex ? 
-                      <button onClick={() => { setQuerySent(false); setSectionIndex(-1); }} className='text-xs text-blue-500 hover:text-gray-500'>
-                        Clear passage context
-                      </button> :                     
-                      <button 
-                        onClick={() => handleSectionSelect(item['section'], item['document'], item['sentence'])} 
-                        className='text-xs text-blue-500 hover:text-gray-500'
-                      >
-                        View in context
-                      </button>
-                    }
-                  </li>))
-                }
-              </ul>
-            </Card>) :
-            <button onClick={() => setDisplayResults(true)} className='text-sm text-blue-500 hover:text-gray-500'>
-              Show Results
-            </button>
-            )} */}
         </div>
       </div>
     </div>
