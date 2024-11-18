@@ -6,13 +6,13 @@ import { useState } from "react";
 import { useTextSectionContext } from "../contexts/TextSectionContext";
 import PassageView from "./PassageView";
 import AlignedResult from "./AlignedResult";
+import { highlightTokenInSentence } from "../../../utils/utils";
 
 interface ResultsCardProps {
   data: ResultItem[];
   submittedText: { queryText: string; targetWord: string } | null;
   displayResults: boolean;
   onToggleDisplay: () => void;
-  highlightTokenInSentence: (sentence: string, token: string) => (string | JSX.Element)[];
   roundScore: (score: number) => string;
 }
 
@@ -21,7 +21,6 @@ export default function ResultsCard({
   submittedText,
   displayResults,
   onToggleDisplay,
-  highlightTokenInSentence,
   roundScore,
 }: ResultsCardProps) {
 
@@ -49,8 +48,8 @@ export default function ResultsCard({
   };
 
   const cardClass = isScrollable ? 
-    "bg-slate-100 p-4 max-w-[80vh] max-h-[70vh] overflow-x-auto overflow-y-auto flex flex-col" 
-    : "bg-slate-100 p-4 max-w-[50vh] flex flex-col" ;
+    "bg-slate-100 p-4 max-w-[55vh] max-h-[70vh] overflow-x-auto overflow-y-auto flex flex-col" 
+    : "bg-slate-100 p-4 max-w-[55vh] flex flex-col" ;
 
   const cardButtons = 
     displayResults ?
@@ -67,6 +66,14 @@ export default function ResultsCard({
     <button onClick={onToggleDisplay} className="text-sm text-blue-500 hover:text-gray-500 pb-4">
       Show Results
     </button>
+
+  const accordionItemClasses = {
+    base: "py-0 w-full",
+    title: "font-normal text-medium",
+    trigger: "px-2 py-0 data-[hover=true]:bg-default-100 rounded-lg h-14 flex items-center",
+    indicator: "text-medium",
+    content: "text-small px-2",
+  };
 
 
   return (
@@ -89,9 +96,9 @@ export default function ResultsCard({
                       </p>
                     }
                     subtitle={ // Number(item['section']) !== sectionIndex &&
-                      <div>
-                        <p className="text-sm">{highlightTokenInSentence(item.sentence, item.token)}</p>
-                        <p className="text-xs font-semibold pt-1">Similarity: {roundScore(item.score)}</p>
+                      <div className="whitespace-normal text-black">
+                        {highlightTokenInSentence(item.sentence, item.token)}
+                        <p className="text-xs text-gray-500 font-semibold pt-1">Similarity: {roundScore(item.score)}</p>
                       </div>
                     }
                     textValue={`${textFiles.find(text => text.value === item.document)?.label}: ${item.section}`}

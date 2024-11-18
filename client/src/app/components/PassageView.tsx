@@ -39,8 +39,8 @@ export default function PassageView({title, content, highlight}: PassageViewProp
     <div>
       <Card 
         className={isScrollable ? 
-          "bg-slate-100 px-1 py-4 max-w-[50vh] max-h-[70vh] overflow-y-auto flex flex-col" 
-          : "bg-slate-100 px-1 py-4 max-w-[50vh] flex flex-col"
+          "bg-slate-100 px-1 py-3 max-w-[55vh] max-h-[70vh] overflow-y-auto flex flex-col" 
+          : "bg-slate-100 px-1 py-3 max-w-[55vh] flex flex-col"
         } 
         shadow="none" 
         radius="none"

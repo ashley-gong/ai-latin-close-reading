@@ -67,7 +67,7 @@ export default function PassageViewContent({ querySent, querySentence, children 
 
   // TODO eventually have the main view be a tab selector, want cluster graphs too
   return (
-    <div className="flex min-h-screen gap-2">
+    <div className="flex min-h-screen gap-1">
 
       {!isLeftSidebarVisible && isDualView && !querySent ? (
         <PassageSidebar
@@ -95,7 +95,7 @@ export default function PassageViewContent({ querySent, querySentence, children 
         />
       )}
 
-      <main className="flex flex-col items-center space-y-4 w-2/3">
+      <main className="flex flex-col items-center space-y-4 w-5/6">
         <div className="flex flex-col gap-2 items-center">
           <div className="row-start-1">
             <button onClick={toggleDualView} className="p-2 bg-gray-500 hover:bg-gray-400 text-white rounded">
@@ -109,7 +109,7 @@ export default function PassageViewContent({ querySent, querySentence, children 
               </button>
             </div> }     
         </div>
-        <div className="flex w-full gap-8">
+        <div className="flex w-full gap-1">
           <div className="flex-1 relative">
             <div className="sticky top-8">
               <PassageView

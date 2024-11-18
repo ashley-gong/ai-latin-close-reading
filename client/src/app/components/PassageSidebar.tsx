@@ -24,8 +24,8 @@ export default function PassageSidebar(
     onToggleSidebar
   }: SidebarProps) {
   return (
-    <aside className="flex flex-col w-1/5 mr-8 p-4">
-      <h1 className="font-semibold text-xl mb-2">Select Text ({title})</h1>
+    <aside className="flex flex-col w-1/6 mr-8 p-4">
+      <h2 className="font-semibold text-xl mb-2">Select Text ({title})</h2>
       {isDualView && 
         <button onClick={onToggleSidebar} className="items-start mb-4 p-2 text-xs hover:text-blue-500">
           Switch to {title === "Left" ? "Right" : "Left"} Sidebar
@@ -37,7 +37,7 @@ export default function PassageSidebar(
             <li
               key={file.value}
               onClick={() => onTextChange(file.value, file.label)}
-              className={`cursor-pointer p-2 ${
+              className={`cursor-pointer p-2 text-xs ${
                 selectedText === file.value ? "bg-blue-500 text-white" : "bg-white"
               }`}
             >
@@ -46,12 +46,12 @@ export default function PassageSidebar(
           ))}
         </ul>
       </div>
-      <h3 className="font-semibold mb-2">Sections/Line Starts</h3>
+      <h4 className="font-semibold mb-2">Sections/Line Starts</h4>
       <ul className="space-y-2 bg-white p-4 shadow-md h-64 overflow-y-auto">
         {sections.map((section, index) => (
           <li
             key={index}
-            className={`cursor-pointer p-2 ${
+            className={`cursor-pointer p-2 text-xs ${
               selectedIndex === index ? "bg-blue-500 text-white" : "bg-gray-100"
             }`}
             onClick={() => onSelectIndex(index)}

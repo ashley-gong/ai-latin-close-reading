@@ -5,7 +5,6 @@ import { Textarea, Input } from "@nextui-org/react";
 import { query } from '../../../utils/api';
 import PassageViewContent from './PassageViewContent';
 import ResultsCard from './ResultsCard';
-import { highlightTokenInSentence } from '../../../utils/utils';
 
 
 export default function NearestNeighborQuery() {
@@ -17,24 +16,26 @@ export default function NearestNeighborQuery() {
   const [loading, setLoading] = useState(false);
   const [doneLoading, setDoneLoading] = useState(false);
   const [numberResults, setNumberResults] = useState('');
+  const [queryError, setQueryError] = useState(false);
 
   const handleSubmit = async () => {
+    console.log(queryText);
+    console.log(targetWord);
     setSubmittedText({ queryText, targetWord });
     setLoading(true);
     setDoneLoading(false);
-    console.log("loading");
     const dataToSend = { targetWord: targetWord, queryText: queryText, numberResults: numberResults };
     try {
       setLoading(true);
       const responseData = await query(dataToSend);
       setData(responseData);
+      setDoneLoading(true);
+      setLoading(false);
+      setDisplayResults(true);
     } catch (error) {
       console.error("Error:", error);
-    } finally {
+      setQueryError(true);
       setLoading(false);
-      setDoneLoading(true);
-      setDisplayResults(true);
-      console.log("done");
     }
   };
 
@@ -51,9 +52,21 @@ export default function NearestNeighborQuery() {
     return lowerBoundedScore.toFixed(3);
   }
 
+  const resultMessage = () => {
+    if (loading) {
+      return <div>Loading...</div> 
+    } else {
+      if (doneLoading) {
+        return <div>Done! View results in single/query view.</div>
+      } else if (queryError) {
+        return <div>Failed to fetch! Double check your query and target word such that neither are empty and your target word appears in your query.</div>
+      } 
+    }
+  }
+
   return (
-    <div className="flex flex-row row-start-2 items-start sm:items-start w-full">
-      <div className="w-4/5">
+    <div className="flex flex-row row-start-2 items-start sm:items-start gap-1 w-full">
+      <div className="w-5/6">
         <PassageViewContent 
           querySent={doneLoading} 
           querySentence={queryText}>
@@ -63,14 +76,13 @@ export default function NearestNeighborQuery() {
                 submittedText={submittedText}
                 displayResults={displayResults}
                 onToggleDisplay={() => setDisplayResults(!displayResults)}
-                highlightTokenInSentence={highlightTokenInSentence}
                 roundScore={roundScore}
               />
             )}
           </PassageViewContent>
       </div>
-      <div className="w-1/5">
-        <div className="flex w-full flex-col md:flex-nowrap gap-y-4">
+      <div className="w-1/6">
+        <div className="flex flex-col md:flex-nowrap gap-y-4">
           <h1 className="font-semibold text-xl">Contextual Nearest Neighbors Queries</h1>
           <p className='text-xs'>
             Model: 
@@ -86,7 +98,8 @@ export default function NearestNeighborQuery() {
             size="lg"
             label="Query"
             placeholder=
-              "Enter the phrase/sentence in which your target word appears. (Highlight from left text for best results."
+              "Enter the phrase/sentence in which your target word appears."
+            description="Highlight from left text for best results."
             className="max-w-lg text-sm"
             radius="none"
             variant="bordered"
@@ -99,6 +112,7 @@ export default function NearestNeighborQuery() {
             type="text"
             variant="underlined"
             placeholder="Target word"
+            description="Enter the word for which you want to find similar usages."
             radius="none"
             className="max-w-lg"
             value={targetWord}
@@ -110,7 +124,8 @@ export default function NearestNeighborQuery() {
             size="lg"
             type="text"
             variant="underlined"
-            placeholder="# of Results (Default is 5)"
+            placeholder="Number of Results"
+            description="The default number (if this field is left empty) is 5."
             radius="none"
             className="max-w-lg"
             value={numberResults}
@@ -120,18 +135,18 @@ export default function NearestNeighborQuery() {
           <div className='flex flex-row gap-4'>
             <button 
               onClick={handleSubmit} 
-              className="w-1/2 p-2 bg-blue-500 hover:bg-blue-300 text-white rounded"
+              className="w-1/2 p-2 bg-blue-500 hover:bg-blue-300 text-white text-sm rounded"
             >
               Submit
             </button>
             <button 
               onClick={handleClear} 
-              className="w-1/2 p-2 text-red-600 hover:text-red-900"
+              className="w-1/2 p-2 text-red-600 hover:text-red-900 text-sm"
             >
               Clear Query (and Results)
             </button>
           </div>
-          {loading ? <div>Loading...</div> : (doneLoading && <div>Done!</div>)}
+          {resultMessage()}
         </div>
       </div>
     </div>

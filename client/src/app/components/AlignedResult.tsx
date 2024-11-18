@@ -18,7 +18,7 @@ export default function AlignedResult(data: Props) {
   };
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-2 overflow-x-auto">
       { data.results.map((item, index) => (
           <div key={index} className="flex flex-row items-center py-2">
             <div className="flex text-xs font-semibold w-1/6">
