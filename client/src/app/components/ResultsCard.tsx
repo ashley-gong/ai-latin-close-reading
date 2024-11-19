@@ -48,8 +48,8 @@ export default function ResultsCard({
   };
 
   const cardClass = isScrollable ? 
-    "bg-slate-100 p-4 max-w-[55vh] max-h-[70vh] overflow-x-auto overflow-y-auto flex flex-col" 
-    : "bg-slate-100 p-4 max-w-[55vh] flex flex-col" ;
+    "bg-slate-100 p-4 max-w-[62vh] max-h-[70vh] overflow-x-auto overflow-y-auto flex flex-col" 
+    : "bg-slate-100 p-4 max-w-[62vh] flex flex-col" ;
 
   const cardButtons = 
     displayResults ?
