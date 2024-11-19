@@ -5,6 +5,7 @@ from scripts.gen_berts import LatinBERT
 
 import os
 from pinecone import Pinecone
+from memory_profiler import profile
 
 # app instance
 app = Flask(__name__)
@@ -25,30 +26,34 @@ def return_home():
     'message': "Hello world!"
   })
 
-@app.route('/api/example', methods=['POST'])
-def example():
-    data = request.json  # Get JSON data sent from the client
-    return data
-
-
-def get_target_embedding(sentence, target_word):
-    bert_sents = bert.get_berts([sentence])[0]
-    for tok, embedding in bert_sents:
-      if tok == target_word:
-        return embedding / LA.norm(embedding)
-    return None
+# def get_target_embedding(sentence, target_word):
+#     bert_sents = bert.get_berts([sentence])[0]
+#     for tok, embedding in bert_sents:
+#       if tok == target_word:
+#         return embedding / LA.norm(embedding)
+#     return None
 
 @app.route('/api/query', methods=['POST'])
+@profile
 def query_similarity():
     data = request.json
     query_text = data.get("queryText")
     target_word = data.get("targetWord")
     num_results = int(data.get("numberResults")) if data.get("numberResults") != "" else 5
 
-    target_embedding = get_target_embedding(query_text, target_word)
+    # target_embedding = get_target_embedding(query_text, target_word)
+    bert_sents = bert.get_berts([query_text])[0]
+    for tok, embedding in bert_sents:
+      if tok == target_word:
+        target_embedding = embedding / LA.norm(embedding)
+        break
+
     target_embedding = target_embedding.tolist()
     if target_embedding is None:
         return jsonify({"error": "Target word not found in the sentence."}), 400
+    
+    if num_results > 30:
+        return jsonify({"error": "Num results exceeds 30 (is too large)."}), 400
         
     results = index.query(vector=target_embedding, top_k=num_results, include_metadata=True)
     output = []
@@ -65,5 +70,5 @@ def query_similarity():
 
 
 if __name__ == "__main__":
-  app.run(host="0.0.0.0", debug=True, port=os.getenv("PORT"))
+  app.run(host="0.0.0.0", debug=True, port=int(os.environ.get("PORT", 8080)))
 

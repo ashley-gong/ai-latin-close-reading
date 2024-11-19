@@ -15,7 +15,7 @@ class LatinBERT():
 		encoder = text_encoder.SubwordTextEncoder(tokenizerPath)
 		self.wp_tokenizer = LatinTokenizer(encoder)
 		self.model = BertLatin(bertPath=bertPath)
-		self.model.to(device)
+		# self.model.to(device)
 
 	def get_batches(self, sentences, max_batch, tokenizer):
 			"""
@@ -276,7 +276,7 @@ class BertLatin(nn.Module):
 	def __init__(self, bertPath=None):
 		super(BertLatin, self).__init__()
 
-		self.bert = BertModel.from_pretrained(bertPath, return_dict=False)
+		self.bert = BertModel.from_pretrained(bertPath, return_dict=False).to(device)
 		self.bert.eval()
 		
 	def forward(self, input_ids, token_type_ids=None, attention_mask=None, transforms=None):

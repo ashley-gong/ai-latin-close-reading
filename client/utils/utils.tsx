@@ -4,7 +4,7 @@ export const highlightTokenInSentence = (sentence: string, token: string) => {
   const parts = sentence.split(regex);   
   return parts.map((part, index) =>
     part.toLowerCase() === token.toLowerCase() ? (
-      <span key={index} className="bg-blue-300">{part}</span>
+      <span key={index} className="bg-blue-200">{part}</span>
     ) : (
       part
     )

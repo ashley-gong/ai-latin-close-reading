@@ -125,12 +125,14 @@ export default function NearestNeighborQuery() {
             type="text"
             variant="underlined"
             placeholder="Number of Results"
-            description="The default number (if this field is left empty) is 5."
+            description="The default number (if this field is left empty) is 5. The maximum number is 30."
             radius="none"
             className="max-w-lg"
             value={numberResults}
             onClear={() => setNumberResults('')}
             onChange={(e) => setNumberResults(e.target.value)}
+            isInvalid={Number(numberResults) > 30}
+            errorMessage="Number of results cannot exceed 30."
           />
           <div className='flex flex-row gap-4'>
             <button 
