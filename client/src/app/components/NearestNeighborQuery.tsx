@@ -82,7 +82,7 @@ export default function NearestNeighborQuery() {
           </PassageViewContent>
       </div>
       <div className="w-1/6">
-        <div className="flex flex-col md:flex-nowrap gap-y-4">
+        <div className="flex flex-col md:flex-nowrap gap-y-4 pl-4">
           <h1 className="font-semibold text-xl">Contextual Nearest Neighbors Queries</h1>
           <p className='text-xs'>
             Model: 
