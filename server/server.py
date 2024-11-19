@@ -14,6 +14,10 @@ pinecone_api_key = os.getenv("PINECONE_API_KEY")
 pc = Pinecone(api_key=pinecone_api_key)
 index = pc.Index("ai-latin-close-reading")
 
+tokenizer_path = 'models/subword_tokenizer_latin/latin.subword.encoder'
+bert_path = 'ashleygong03/bamman-burns-latin-bert'
+bert = LatinBERT(tokenizerPath=tokenizer_path, bertPath=bert_path)
+
 
 @app.route("/api/home", methods=['GET'])
 def return_home():
@@ -28,9 +32,6 @@ def example():
 
 
 def get_target_embedding(sentence, target_word):
-    tokenizer_path = 'models/subword_tokenizer_latin/latin.subword.encoder'
-    bert_path = 'models/latin_bert'
-    bert = LatinBERT(tokenizerPath=tokenizer_path, bertPath=bert_path)
     bert_sents = bert.get_berts([sentence])[0]
     for tok, embedding in bert_sents:
       if tok == target_word:
@@ -64,5 +65,5 @@ def query_similarity():
 
 
 if __name__ == "__main__":
-  app.run(host="0.0.0.0", debug=True, port=8080)
+  app.run(host="0.0.0.0", debug=True, port=os.getenv("PORT"))
 
