@@ -64,7 +64,7 @@ export default function NearestNeighborQuery() {
           <ul className="list-disc text-xs whitespace-normal">
             <li>Neither fields are empty.</li>
             <li>Your target word appears in your query.</li>
-            <li>If your target word is adjacent to a single quote (e.g. 'nate) or to punctuation and a single quote (e.g. sequamur.'), include them in your target word! (Bug to be fixed)</li>
+            <li>If your target word is adjacent to a single quote (e.g. &apos;nate) or to punctuation and a single quote (e.g. sequamur.&apos;), include them in your target word! (Bug to be fixed)</li>
           </ul> 
         </div>)
       } 
