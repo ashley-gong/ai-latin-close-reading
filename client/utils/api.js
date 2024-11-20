@@ -1,12 +1,12 @@
 export const fetchExample = async () => {
-  const response = await fetch('http://127.0.0.1:8080/api/home');
+  const response = await fetch('http://159.223.163.12/api/home');
   const data = await response.json();
   return data;
 };
 
 export const query = async (dataToSend) => {
   try {
-    const response = await fetch('http://127.0.0.1:8080/api/query', {
+    const response = await fetch('http://159.223.163.12/api/query', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

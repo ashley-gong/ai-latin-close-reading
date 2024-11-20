@@ -2,19 +2,18 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from numpy import linalg as LA
 from scripts.gen_berts import LatinBERT
-
+import json
 import os
 from pinecone import Pinecone
-
-# from google.cloud import secretmanager
-# client = secretmanager.SecretManagerServiceClient()
-# pinecone_api_key = client.access_secret_version(request={'name': 'projects/615757532460/secrets/PINECONE_API_KEY/versions/1'}).payload.data.decode("utf-8")
 
 # app instance
 app = Flask(__name__)
 CORS(app)
 
-pinecone_api_key = os.getenv("PINECONE_API_KEY")
+with open(f"/etc/config_server.json") as config_file:
+    config = json.load(config_file)
+
+pinecone_api_key = config["PINECONE_API_KEY"] # os.getenv("PINECONE_API_KEY")
 pc = Pinecone(api_key=pinecone_api_key)
 index = pc.Index("ai-latin-close-reading")
 
@@ -73,5 +72,5 @@ def query_similarity():
 
 
 if __name__ == "__main__":
-  app.run(host="0.0.0.0", debug=True, port=int(os.environ.get("PORT", 8080)))
+  app.run(host="0.0.0.0", debug=True, port=int(os.environ.get("PORT", 8000)))
 
