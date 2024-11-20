@@ -20,7 +20,7 @@ index = pc.Index("ai-latin-close-reading")
 
 tokenizer_path = 'models/subword_tokenizer_latin/latin.subword.encoder'
 bert_path = 'ashleygong03/bamman-burns-latin-bert'
-bert = LatinBERT(tokenizerPath=tokenizer_path, bertPath=bert_path)
+# bert = LatinBERT(tokenizerPath=tokenizer_path, bertPath=bert_path)
 
 
 @app.route("/api/home", methods=['GET'])
