@@ -5,7 +5,10 @@ from scripts.gen_berts import LatinBERT
 
 import os
 from pinecone import Pinecone
-from memory_profiler import profile
+
+# from google.cloud import secretmanager
+# client = secretmanager.SecretManagerServiceClient()
+# pinecone_api_key = client.access_secret_version(request={'name': 'projects/615757532460/secrets/PINECONE_API_KEY/versions/1'}).payload.data.decode("utf-8")
 
 # app instance
 app = Flask(__name__)
@@ -34,7 +37,6 @@ def return_home():
 #     return None
 
 @app.route('/api/query', methods=['POST'])
-@profile
 def query_similarity():
     data = request.json
     query_text = data.get("queryText")
