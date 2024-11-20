@@ -24,7 +24,7 @@ export default function NearestNeighborQuery() {
     setSubmittedText({ queryText, targetWord });
     setLoading(true);
     setDoneLoading(false);
-    const dataToSend = { targetWord: targetWord, queryText: queryText, numberResults: numberResults };
+    const dataToSend = { targetWord: targetWord.toLowerCase(), queryText: queryText, numberResults: numberResults };
     try {
       setLoading(true);
       const responseData = await query(dataToSend);
@@ -59,7 +59,14 @@ export default function NearestNeighborQuery() {
       if (doneLoading) {
         return <div>Done! View results in single/query view.</div>
       } else if (queryError) {
-        return <div>Failed to fetch! Double check your query and target word such that neither are empty and your target word appears in your query.</div>
+        return (<div>
+          Failed to fetch! Double check your query and target word such that:
+          <ul className="list-disc text-xs whitespace-normal">
+            <li>Neither fields are empty.</li>
+            <li>Your target word appears in your query.</li>
+            <li>If your target word is adjacent to a single quote (e.g. 'nate) or to punctuation and a single quote (e.g. sequamur.'), include them in your target word! (Bug to be fixed)</li>
+          </ul> 
+        </div>)
       } 
     }
   }
