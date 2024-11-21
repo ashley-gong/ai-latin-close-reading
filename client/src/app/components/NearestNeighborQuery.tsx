@@ -66,6 +66,7 @@ export default function NearestNeighborQuery() {
             <li>Your target word appears in your query.</li>
             <li>If your target word is adjacent to a SINGLE quote (e.g. &apos;nate) or to punctuation and a SINGLE quote (e.g. sequamur.&apos;), include them in your target word! (Bug to be fixed)</li>
             <li>In some situations, try a word in a different case than it appears in the query (e.g. nominative).</li>
+            <li>In some cases (particularly in poetry), you may need to limit your query to one line (but not always).</li>
           </ul> 
         </div>)
       } 
