@@ -10,10 +10,10 @@ from pinecone import Pinecone
 app = Flask(__name__)
 CORS(app)
 
-with open(f"/etc/config_server.json") as config_file:
-    config = json.load(config_file)
+# with open(f"/etc/config_server.json") as config_file:
+#     config = json.load(config_file)
 
-pinecone_api_key = config["PINECONE_API_KEY"] # os.getenv("PINECONE_API_KEY")
+pinecone_api_key = os.getenv("PINECONE_API_KEY") # config["PINECONE_API_KEY"]
 pc = Pinecone(api_key=pinecone_api_key)
 index = pc.Index("ai-latin-close-reading")
 
@@ -29,46 +29,55 @@ def return_home():
   })
 
 def get_target_embedding(sentence, target_word):
-    bert_sents = bert.get_berts([sentence])[0]
-    for tok, embedding in bert_sents:
-      if tok == target_word:
-        return embedding / LA.norm(embedding)
-    return None
+  bert_sents = bert.get_berts([sentence])[0]
+  for tok, embedding in bert_sents:
+    if tok == target_word:
+      return embedding / LA.norm(embedding)
+  return None
 
 @app.route('/api/query', methods=['POST'])
 def query_similarity():
-    data = request.json
-    query_text = data.get("queryText")
-    target_word = data.get("targetWord")
-    num_results = int(data.get("numberResults")) if data.get("numberResults") != "" else 5
+  data = request.json
+  query_text = data.get("queryText")
+  target_word = data.get("targetWord")
+  num_results = int(data.get("numberResults")) if data.get("numberResults") != "" else 5
+  target_texts = data.get("targetTexts")
 
-    target_embedding = None #get_target_embedding(query_text, target_word)
-    bert_sents = bert.get_berts([query_text])[0]
-    for tok, embedding in bert_sents:
-      if tok == target_word:
-        target_embedding = embedding / LA.norm(embedding)
-        break
+  target_embedding = None
+  bert_sents = bert.get_berts([query_text])[0]
+  for tok, embedding in bert_sents:
+    if tok == target_word:
+      target_embedding = embedding / LA.norm(embedding)
+      break
 
-    if target_embedding is None:
-        return jsonify({"error": "Target word not found in the sentence."}), 400
+  if target_embedding is None:
+    return jsonify({"error": "Target word not found in the sentence."}), 400
+
+  target_embedding = target_embedding.tolist()
   
-    target_embedding = target_embedding.tolist()
-    
-    if num_results > 30:
-        return jsonify({"error": "Num results exceeds 30 (is too large)."}), 400
-        
-    results = index.query(vector=target_embedding, top_k=num_results, include_metadata=True)
-    output = []
-    for match in results['matches']:      
-      output.append({
-            "score": match['score'], 
-            "token": match['metadata']['token'], 
-            "document": match['metadata']['document'],
-            "sentence": match['metadata']['sentence'],
-            "section": match['metadata']['section']
-          })
+  if num_results > 30:
+    return jsonify({"error": "Num results exceeds 30 (is too large)."}), 400
 
-    return output
+  if len(target_texts) > 0:  
+    results = index.query(
+      vector=target_embedding, 
+      top_k=num_results, 
+      include_metadata=True, 
+      filter={"document": {"$in": target_texts}}
+    )
+  else:
+    results = index.query(vector=target_embedding, top_k=num_results, include_metadata=True)
+  output = []
+  for match in results['matches']:      
+    output.append({
+      "score": match['score'], 
+      "token": match['metadata']['token'], 
+      "document": match['metadata']['document'],
+      "sentence": match['metadata']['sentence'],
+      "section": match['metadata']['section']
+    })
+
+  return output
 
 
 if __name__ == "__main__":

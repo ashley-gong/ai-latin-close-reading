@@ -1,10 +1,11 @@
 "use client"
 
 import { useState } from 'react';
-import { Textarea, Input } from "@nextui-org/react";
+import { Textarea, Input, Select, SelectItem } from "@nextui-org/react";
 import { query } from '../../../utils/api';
 import PassageViewContent from './PassageViewContent';
 import ResultsCard from './ResultsCard';
+import { textFiles } from '../../../utils/constants';
 
 
 export default function NearestNeighborQuery() {
@@ -17,6 +18,23 @@ export default function NearestNeighborQuery() {
   const [doneLoading, setDoneLoading] = useState(false);
   const [numberResults, setNumberResults] = useState('');
   const [queryError, setQueryError] = useState(false);
+  const [targetTexts, setTargetTexts] = useState<string[]>([]);
+
+  const textDropdown = (
+    <Select 
+      label="Target Texts (optional)" 
+      onChange={(e) => {setTargetTexts(e.target.value.split(","))}}
+      selectionMode="multiple"
+    >
+      {textFiles.map((file) => (
+        <SelectItem
+          key={file.value}
+        >
+          {file.label}
+        </SelectItem>
+      ))}
+    </Select>
+  )
 
   const handleSubmit = async () => {
     console.log(queryText);
@@ -24,7 +42,12 @@ export default function NearestNeighborQuery() {
     setSubmittedText({ queryText, targetWord });
     setLoading(true);
     setDoneLoading(false);
-    const dataToSend = { targetWord: targetWord.toLowerCase(), queryText: queryText, numberResults: numberResults };
+    const dataToSend = { 
+      targetWord: targetWord.toLowerCase(), 
+      queryText: queryText, 
+      numberResults: numberResults, 
+      targetTexts: targetTexts
+    };
     try {
       setLoading(true);
       const responseData = await query(dataToSend);
@@ -143,6 +166,7 @@ export default function NearestNeighborQuery() {
             isInvalid={Number(numberResults) > 30}
             errorMessage="Number of results cannot exceed 30."
           />
+          { textDropdown }
           <div className='flex flex-row gap-4'>
             <button 
               onClick={handleSubmit} 
