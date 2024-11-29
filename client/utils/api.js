@@ -1,12 +1,12 @@
 export const fetchExample = async () => {
-  const response = await fetch('https://159.223.163.12/api/home');
+  const response = await fetch('https://api.ai-latin-close-reading.online/api/home');
   const data = await response.json();
   return data;
 };
 
 export const query = async (dataToSend) => {
   try {
-    const response = await fetch('https://159.223.163.12/api/query', {
+    const response = await fetch('https://api.ai-latin-close-reading.online/api/query', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
