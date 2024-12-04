@@ -23,8 +23,13 @@ export default function NearestNeighborQuery() {
   const textDropdown = (
     <Select 
       label="Target Texts (optional)" 
-      onChange={(e) => {setTargetTexts(e.target.value.split(","))}}
+      onChange={(e) => {
+        console.log(e.target.value.split(",")); 
+        setTargetTexts(e.target.value.split(","));
+      }}
       selectionMode="multiple"
+      selectedKeys={targetTexts}
+      className='max-w-[400px] overflow-hidden truncate'
     >
       {textFiles.map((file) => (
         <SelectItem
@@ -65,6 +70,7 @@ export default function NearestNeighborQuery() {
   const handleClear = () => {
     setQueryText('');
     setTargetWord('');
+    setTargetTexts([]);
     setLoading(false);
     setDoneLoading(false);
   };
