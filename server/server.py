@@ -58,7 +58,7 @@ def query_similarity():
   if num_results > 30:
     return jsonify({"error": "Num results exceeds 30 (is too large)."}), 400
 
-  if len(target_texts) > 0 and target_texts[0] != "":  
+  if len(target_texts) > 1:  
     results = index.query(
       vector=target_embedding, 
       top_k=num_results, 
